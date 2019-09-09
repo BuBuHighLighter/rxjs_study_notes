@@ -7,10 +7,12 @@ npm install rxjs
 
 ## $知识点
 1.Observable
+
 2.Observer
 
 ## $Observer
 观察者（Observer）是一个有三个方法的对象
+
 |方法名|作用|
 |-|-|
 |next|当Observable 发出新的值时被调用，接收这个值作为参数|
@@ -184,6 +186,7 @@ interval(1000).subscribe(console.log)       // 0,1,2,3....
 
 timer则可以接收两个参数
 参数列表
+
 |参数名|说明|可省|类型|
 |-|-|-|-|
 |需要等待的时间|发出第一个值需要等待的时间|否|**数字**或**Date**|
