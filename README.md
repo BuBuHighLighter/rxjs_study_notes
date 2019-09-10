@@ -10,6 +10,8 @@ npm install rxjs
 
 2.Observer
 
+3.创建Observable
+
 ## $Observer
 观察者（Observer）是一个有三个方法的对象
 
@@ -213,3 +215,107 @@ defer创建的Observable只有**在订阅时才会去创建**我们真正想要�
 defer(() => ajax(ajaxUrl));     // 只有订阅了才会去发送ajax请求
 ```
 
+## 操作符
+操作符其实看作是处理数据流的管道，每个操作符实现了针对某个小的具体应用问题的功能，RxJS 编程最大的难点其实就是**如何去组合这些操作符从而解决我们的问题**。
+
+RxJs有各种各样的操作符：
+
+- 转化类
+- 过滤类
+- 合并类
+- 多播类
+- 错误处理类
+- 辅助工具类
+- ...
+
+操作符是一个函数，一般不需要自己去实现操作符。但是实现的时候必须考虑以下功能：
+
+> 1.返回一个全新的 Observable 对象
+
+> 2.对上游和下游的订阅和退订处理
+
+> 3.处理异常情况
+
+> 4.及时释放资源
+
+之前版本的RxJs各种操作符都挂载到了全局的Observable对象上，现在分离出来需要如下引入才能使用：
+
+```js
+import {filter, map} from 'rxjs/operators';
+
+source.pipe(
+    filter( x => x % 2 === 0),
+    map( x => x * 2)
+)
+```
+
+### pipe
+pipe就是管道的意思，数据流通过操作符处理，流出然后交给下一个操作符。
+
+### 几个类似数组方法的基础操作符
+|操作符|说明|备注|
+|-|-|-|
+|map|和数组的map类似|-|
+|filter|和数组的filter类似|-|
+|scan|和reduce类似|-|
+|mapTo|将所有发出的数据映射到一个给定的值|-|
+
+**mapTo实例**
+
+[实例代码](./demo4/index.ts)
+
+```js
+import {interval} from 'rxjs';
+import {mapTo} from 'rxjs/operators';
+
+const observable = interval(1000).pipe(
+    mapTo('Hi')
+)
+
+observable.subscribe(
+    x => console.log(x)
+)
+```
+每隔1000ms就会输出一个'Hi';
+
+### 一些过滤的操作符
+|操作符|说明|备注|
+|-|-|-|
+|take|从数据流中选取最先发出的若干数据|-|
+|takeLast|从数据流中选取最后发出的若干数据|-|
+|takeUntil|从数据流中选取知道发生某种情况前发出的若干数据|-|
+|first|获得满足判断条件的第一个数据|-|
+|last|获得满足判断条件的最后一个数据|-|
+|skip|从数据流中忽略最先发出的若干数据|-|
+|skipLast|从数据流中忽略最后发出的若干数据|-|
+
+**用take举例**
+
+```js
+import {interval} from 'rxjs';
+import {take} from 'rxjs/operators';
+
+imterval(1000).pipe(
+    take(3)
+).subscribe(
+    x => console.log(x),
+    null,
+    () => console.log('complete')
+)
+
+// 输出：0、1、2、complete
+```
+使用了take(3)，表示只取3个数据，Observable就进入完结状态。
+
+```js
+import { interval, fromEvent } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+interval(1000).pipe(
+    takeUntil(fromEvent(document.querySelector('#btn'), 'click'))
+).subscribe(
+    x => { document.querySelector('#time').textContent = x + 1 },
+    null,
+    () => console.log('complete')
+```
+这里有一个interval一直发出数据，直到当用户点击了按钮时才停止。
