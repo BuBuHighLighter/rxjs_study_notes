@@ -319,5 +319,3 @@ interval(1000).pipe(
     () => console.log('complete')
 ```
 这里有一个interval一直发出数据，直到当用户点击了按钮时才停止。
-
-
